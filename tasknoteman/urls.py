@@ -15,7 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from taskman.views import index,CreateProject,ProjectDetail,ProjectEdit,ProjectDelete
+from taskman.views import (
+                            index,CreateProject,ProjectDetail,ProjectEdit,ProjectDelete,
+                            CreateTask,TaskList,PriorityCreate,TagCreate
+                        )
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,4 +27,8 @@ urlpatterns = [
     path('project/<int:pk>/',ProjectDetail.as_view(),name='project-detail'),
     path('project/<int:pk>/edit',ProjectEdit.as_view(),name='project-edit'),
     path('project/<int:pk>/delete',ProjectDelete.as_view(),name='project-delete'),
+    path('task/new/',CreateTask.as_view(),name='task-create'),
+    path('tasks/',TaskList.as_view(),name='tasks-list'),
+    path('priority/new/',PriorityCreate.as_view(),name='priority-create'),
+    path('tag/new/',TagCreate.as_view(),name='tag-create'),
 ]

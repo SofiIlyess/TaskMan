@@ -1,7 +1,9 @@
+from typing import Any, Dict
+from django.db import models
 from django.forms.models import BaseModelForm
 from django.http import HttpResponse
 from django.shortcuts import render
-from .models import Project,Folder,User
+from .models import Project,Folder,User,Task,Proritie,Tag
 from django.views.generic import (
     ListView,
     DetailView,
@@ -10,19 +12,27 @@ from django.views.generic import (
     DeleteView
 )
 from django.contrib.auth.mixins import LoginRequiredMixin,UserPassesTestMixin
-
+from .forms import TaskForm
 
 # Create your views here.
 def index(request):
+    tasks = Task.objects.all()
     user = request.user
     projectslist = user.owned_projects.all()
     folderslist = Folder.objects.all()
-    return render(request,'taskman/index.html',{'projects':projectslist,'folders':folderslist})
+    return render(request,'taskman/index.html',{'projects':projectslist,'folders':folderslist,'tasks':tasks})
 
 
 class CreateProject(LoginRequiredMixin,CreateView):
     model = Project
     fields = ['name','description','status']
+    
+    def get_context_data(self, **kwargs: Any):
+        context = super().get_context_data(**kwargs)
+        context['projects'] = self.request.user.owned_projects.all()
+        context['folders'] = Folder.objects.all()
+        return context
+    
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
@@ -32,11 +42,22 @@ class CreateProject(LoginRequiredMixin,CreateView):
 class ProjectDetail(LoginRequiredMixin,DetailView):
     model = Project
 
+    def get_context_data(self, **kwargs: Any):
+        context = super().get_context_data(**kwargs)
+        context['projects'] = self.request.user.owned_projects.all()
+        context['folders'] = Folder.objects.all()
+        return context
 
 class ProjectEdit(LoginRequiredMixin,UserPassesTestMixin,UpdateView):
     model= Project
     fields = ['name','description','contributors','status']
 
+    def get_context_data(self, **kwargs: Any):
+        context = super().get_context_data(**kwargs)
+        context['projects'] = self.request.user.owned_projects.all()
+        context['folders'] = Folder.objects.all()
+        return context
+    
     def form_valid(self, form):
         form.instance.owner = self.request.user
         return super().form_valid(form)
@@ -58,3 +79,60 @@ class ProjectDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         if self.request.user == pr.owner:
             return True
         return False
+    
+class CreateTask(LoginRequiredMixin, CreateView):
+    model = Task
+    # fields = ['title','description','due_date','priority','tags','project','is_completed']
+    form_class = TaskForm
+
+    def get_context_data(self, **kwargs: Any):
+        context = super().get_context_data(**kwargs)
+        context['projects'] = self.request.user.owned_projects.all()
+        context['folders'] = Folder.objects.all()
+        return context
+    
+    def form_valid(self,form):
+        form.instance.assigned_to = self.request.user
+        return super().form_valid(form)
+    
+class TaskList(LoginRequiredMixin,ListView):
+    model = Task
+    template_name = 'task_list.html'
+    context_object_name = 'tasks'
+    ordering = ['-create_on']
+
+    def get_context_data(self, **kwargs: Any):
+        context = super().get_context_data(**kwargs)
+        context['projects'] = self.request.user.owned_projects.all()
+        context['folders'] = Folder.objects.all()
+        return context
+
+class PriorityCreate(LoginRequiredMixin,CreateView):
+    model = Proritie
+    fields = ('__all__')
+    success_url = '/'
+
+    def get_context_data(self, **kwargs: Any):
+        context = super().get_context_data(**kwargs)
+        context['projects'] = self.request.user.owned_projects.all()
+        context['folders'] = Folder.objects.all()
+        return context
+    
+    def form_valid(self, form):
+        return super().form_valid(form)
+    
+
+class TagCreate(LoginRequiredMixin,CreateView):
+    model = Tag
+    fields = ('__all__')
+    success_url = '/tag/new/'
+    extra_context = {'tags':Tag.objects.all()}
+
+    def get_context_data(self, **kwargs: Any):
+        context = super().get_context_data(**kwargs)
+        context['projects'] = self.request.user.owned_projects.all()
+        context['folders'] = Folder.objects.all()
+        return context
+    
+    def form_valid(self, form):
+        return super().form_valid(form)

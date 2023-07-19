@@ -10,18 +10,23 @@ class Proritie(models.Model):
         return self.name
 
 class Task(models.Model):
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255,unique=True)
     description = models.TextField(blank=True,null=True)
-    due_date = models.DateTimeField(blank=True,null=True)
+    due_date = models.DateTimeField(blank=True,null=True,default=datetime.datetime.now)
+    create_on = models.DateTimeField(default=datetime.datetime.now)
     priority = models.ForeignKey(Proritie, on_delete=models.SET_NULL,null=True,blank=True)
     tags = models.ManyToManyField('Tag',blank=True,null=True)
     project = models.ForeignKey('Project', on_delete=models.CASCADE,null=True,blank=True)
     assigned_to = models.ForeignKey(User, on_delete=models.CASCADE)
     is_completed = models.BooleanField(default=False)
     completed_date = models.DateTimeField(null=True, blank=True)
+    folder = models.ForeignKey('Folder', on_delete=models.CASCADE,null=True,blank=True)
 
     def __str__(self):
         return self.title
+    
+    def get_absolute_url(self):
+        return reverse('tasks-list')
 
 
 class Tag(models.Model):

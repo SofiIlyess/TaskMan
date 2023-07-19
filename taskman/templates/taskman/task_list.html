@@ -1,5 +1,4 @@
 {% load static %}
-{% load crispy_forms_tags %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -36,10 +35,10 @@
           </button>
         </div>
         <div>
-          <a class="navbar-brand brand-logo" href="index.html">
+          <a class="navbar-brand brand-logo" href="{% url 'index' %}">
             <img src="{% static 'taskman/images/logo.svg' %}" alt="logo" />
           </a>
-          <a class="navbar-brand brand-logo-mini" href="index.html">
+          <a class="navbar-brand brand-logo-mini" href="{% url 'index' %}">
             <img src="{% static 'taskman/images/logo-mini.svg' %}" alt="logo" />
           </a>
         </div>
@@ -162,7 +161,7 @@
           </li>
           <li class="nav-item dropdown d-none d-lg-block user-dropdown">
             <a class="nav-link" id="UserDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
-              <img class="img-xs rounded-circle" src="images/faces/face8.jpg" alt="Profile image"> </a>
+              <img class="img-xs rounded-circle" src="{% static 'taskman/images/faces/face8.jpg' %}" alt="Profile image"> </a>
             <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
               <div class="dropdown-header text-center">
                 <img class="img-md rounded-circle" src="images/faces/face8.jpg" alt="Profile image">
@@ -185,7 +184,24 @@
     <!-- partial -->
     <div class="container-fluid page-body-wrapper">
       <!-- partial:partials/_settings-panel.html -->
-      
+      <div class="theme-setting-wrapper">
+        <div id="settings-trigger"><i class="ti-settings"></i></div>
+        <div id="theme-settings" class="settings-panel">
+          <i class="settings-close ti-close"></i>
+          <p class="settings-heading">SIDEBAR SKINS</p>
+          <div class="sidebar-bg-options selected" id="sidebar-light-theme"><div class="img-ss rounded-circle bg-light border me-3"></div>Light</div>
+          <div class="sidebar-bg-options" id="sidebar-dark-theme"><div class="img-ss rounded-circle bg-dark border me-3"></div>Dark</div>
+          <p class="settings-heading mt-2">HEADER SKINS</p>
+          <div class="color-tiles mx-0 px-4">
+            <div class="tiles success"></div>
+            <div class="tiles warning"></div>
+            <div class="tiles danger"></div>
+            <div class="tiles info"></div>
+            <div class="tiles dark"></div>
+            <div class="tiles default"></div>
+          </div>
+        </div>
+      </div>
       <div id="right-sidebar" class="settings-panel">
         <i class="settings-close ti-close"></i>
         <ul class="nav nav-tabs border-top" id="setting-panel" role="tablist">
@@ -349,16 +365,16 @@
           <li class="nav-item nav-category">Task-Man</li>
           {% for p in projects %}
             <li class="nav-item">
-              <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic-{{ p.id }}" aria-expanded="false" aria-controls="ui-basic-{{ p.id }}">
+              <a class="nav-link" data-bs-toggle="collapse" href="#pr-{{ p.id }}" aria-expanded="false" aria-controls="pr-{{ p.id }}">
                 <i class="menu-icon mdi mdi-library-books"></i>
                 <span class="menu-title">{{ p.name }}</span>
                 <i class="menu-arrow"></i> 
               </a>
-              <div class="collapse" id="ui-basic-{{ p.id }}">
+              <div class="collapse" id="pr-{{ p.id }}">
                 <ul class="nav flex-column sub-menu">
                   {% for f in folders %}
                   {% if f.project.id == p.id %}
-                    <li class="nav-item"> <a class="nav-link" href="pages/ui-features/buttons.html">{{ f.name }}</a></li>
+                    <li class="nav-item"> <a class="nav-link" href="#">{{ f.name }}</a></li>
                   {% endif %}
                   {% endfor %}
                 </ul>
@@ -450,79 +466,120 @@
           <div class="row">
             <div class="col-sm-12">
               <div class="home-tab">
+                
                 <div class="tab-content tab-content-basic">
                   <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview"> 
+                    
                     <div class="row">
                       <div class="col-lg-12 d-flex flex-column">
+                        
+                        
                         <div class="row flex-grow">
-                          <div class="col-12 col-lg-4 col-lg-12 grid-margin stretch-card">
+                          <div class="col-12 grid-margin stretch-card">
                             <div class="card card-rounded">
                               <div class="card-body">
-                                {% if object.owner == user %}
-                                <div class="btn-wrapper">
-                                    <a href="{% url 'project-edit' object.id %}" class="btn btn-outline-primary" style="float:right"><i class="ti-pencil"></i>Edit</a>
-                                    <a href="{% url 'project-delete' object.id %}" class="btn btn-outline-danger" style="float:right"><i class="ti-trash"></i>Delete</a>
-                                </div>
-                                {% endif %}
                                 <div class="d-sm-flex justify-content-between align-items-start">
                                   <div>
-                                   <h4 class="card-title card-title-dash">{{ object.name }} 
-                                   {% if object.status == 1 %}
-                                   <span><div class="badge badge-opacity-warning">{{object.get_status_display}}</div></span>
-                                   {% elif object.status == 2 %}
-                                   <span><div class="badge badge-opacity-danger">{{object.get_status_display}}</div></span>
+                                    <h4 class="card-title card-title-dash">Pending Tasks</h4>
+                                    {% if tasks.count > 1 %}
+                                   <p class="card-subtitle card-subtitle-dash">You have {{ tasks.count }} tasks</p>
                                    {% else %}
-                                   <span><div class="badge badge-opacity-success">{{object.get_status_display}}</div></span>
+                                   <p class="card-subtitle card-subtitle-dash">You have {{ tasks.count }} task</p>
                                    {% endif %}
-                                   <p>{{ object.createon }}</p>
-                                    </h4>
-
-                                   <h5 class="card-subtitle card-subtitle-dash">by {{ object.owner.username }}</h5>
-                                    <h6>{{ object.description }}</h6>
-                                    {% if object.contributors.count == 0 %}
-                                        <p>No Contributors</p>
-                                    {% else %}
-                                        <p>{{ object.contributors.count }} Contributors : {{ object.contributors }} </p>
-                                    {% endif %}
-                                    
-                                    
-                                    
-                                  </div>                                  
+                                  </div>
+                                  <div>
+                                    <a href="{% url 'task-create' %}"><button class="btn btn-icons btn-primary btn-rounded text-white mb-0 me-0" type="button"><i class="mdi mdi-plus"></i></button></a>
+                                  </div>
                                 </div>
-                                
+                                <div class="table-responsive">
+                                  <table class="table table-hover">
+                                    <thead>
+                                      <tr>
+                                        <th>title</th>
+                                        <th>description</th>
+                                        <th>Create on</th>
+                                        <th>Due date</th>
+                                        <th>Priority</th>
+                                        <th>Tags</th>
+                                        <th>Project</th>
+                                        <th>Assigned to</th>
+                                        <th>Is completed</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {% for t in tasks %}
+                                      <tr>
+                                        <td>
+                                          <div class="d-flex">
+                                            <!-- <img src="{% static 'taskman/images/faces/face1.jpg' %}" alt=""> -->
+                                            <div>
+                                              <h6>{{ t.title }}</h6>
+                                              <p></p>
+                                            </div>
+                                          </div>
+                                        </td>
+                                        <td>
+                                          <a href="#"><h6>{{t.description}}</h6></a>
+                                          <p></p>
+                                        </td>
+                                        <td>
+                                          <p>{{ t.create_on }}</p>
+                                        </td>
+                                        <td>
+                                          <div>
+                                            <div>
+                                              <p>{{ t.due_date }}</p>
+                                            </div>
+                                          </div>
+                                        </td>
+                                        {% if t.priority.name == 'Low' %}
+                                        <td><div class="badge badge-opacity-warning">{{t.priority.name}}</div></td>
+                                        {% elif t.priority.name == 'High' %}
+                                        <td><div class="badge badge-opacity-danger">{{t.priority}}</div></td>
+                                        {% else %}
+                                        <td><div class="badge badge-opacity-success">{{t.priority}}</div></td>
+                                        {% endif %}
+                                        
+                                        <td>
+                                          <div>
+                                            <p>{{t.tags.name}}</p>
+                                          </div>
+                                        </td>
+                                        <td>
+                                          <div>
+                                            <p>{{t.project.name}}</p>
+                                          </div>
+                                        </td>
+                                        <td>
+                                          <div>
+                                            <p>{{t.assigned_to}}</p>
+                                          </div>
+                                        </td>
+                                        <td>
+                                          <div style="text-align: center;">
+                                            <input type="checkbox" class="form-check-input" id="id_is_comp">
+                                            <label for="id_is_comp" class="form-check-label">completed</label>
+                                            
+                                          </div>
+                                        </td>
+                                      </tr>
+                                      
+                                      {% endfor %}
+                                      
+                                    </tbody>
+                                  </table>
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
+                        
                       </div>
+                      
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-sm-12">
-                <div class="card card-rounded">
-                    <div class="card-body">
-                        <h4 class="card-title card-title-dash">Project folders</h4>
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <th>Name</th>
-                                </thead>
-                                <tbody>
-                                    {% for f in object.folders.all %}
-                                    <tr>
-                                        <td>{{ f.name }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                    </div>
-                </div>
             </div>
           </div>
         </div>
