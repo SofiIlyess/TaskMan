@@ -17,7 +17,8 @@ from django.contrib import admin
 from django.urls import path
 from taskman.views import (
                             index,CreateProject,ProjectDetail,ProjectEdit,ProjectDelete,
-                            CreateTask,TaskList,PriorityCreate,TagCreate
+                            CreateTask,TaskList,PriorityCreate,TagCreate,TagDelete,TagUpdate,TagsDeleteAll,
+                            PriorityUpdate,PriorityDelete,PriorityDeleteAll
                         )
 
 urlpatterns = [
@@ -30,5 +31,11 @@ urlpatterns = [
     path('task/new/',CreateTask.as_view(),name='task-create'),
     path('tasks/',TaskList.as_view(),name='tasks-list'),
     path('priority/new/',PriorityCreate.as_view(),name='priority-create'),
+    path('priority/<int:pk>/edit',PriorityUpdate.as_view(),name='priority-edit'),
+    path('priority/<int:pk>/delete',PriorityDelete.as_view(),name='priority-delete'),
+    path('priority/deleteAll',PriorityDeleteAll,name='priority-delete-all'),
     path('tag/new/',TagCreate.as_view(),name='tag-create'),
+    path('tag/<int:pk>/delete',TagDelete.as_view(),name='tag-delete'),
+    path('tag/<int:pk>/edit',TagUpdate.as_view(),name='tag-edit'),
+    path('tag/deleteAll',TagsDeleteAll,name='tag-delete-all',)
 ]

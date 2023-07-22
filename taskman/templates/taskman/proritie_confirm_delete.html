@@ -36,10 +36,10 @@
           </button>
         </div>
         <div>
-          <a class="navbar-brand brand-logo" href="{% url 'index' %}">
+          <a class="navbar-brand brand-logo" href="index.html">
             <img src="{% static 'taskman/images/logo.svg' %}" alt="logo" />
           </a>
-          <a class="navbar-brand brand-logo-mini" href="{% url 'index' %}">
+          <a class="navbar-brand brand-logo-mini" href="index.html">
             <img src="{% static 'taskman/images/logo-mini.svg' %}" alt="logo" />
           </a>
         </div>
@@ -343,7 +343,7 @@
           <li class="nav-item">
             <a class="nav-link" href="{% url 'index' %}">
               <i class="mdi mdi-grid-large menu-icon"></i>
-              <span class="menu-title">DashHome</span>
+              <span class="menu-title">Dashboard</span>
             </a>
           </li>
           <li class="nav-item nav-category">Task-Man</li>
@@ -422,18 +422,18 @@
               </ul>
             </div>
           </li>
-          <li class="nav-item nav-category">Settings</li>
+          <li class="nav-item nav-category">pages</li>
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'priority-create' %}">
-              <i class="menu-icon mdi mdi-priority-high"></i>
-              <span class="menu-title">Priorities</span>
+            <a class="nav-link" data-bs-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
+              <i class="menu-icon mdi mdi-account-circle-outline"></i>
+              <span class="menu-title">User Pages</span>
+              <i class="menu-arrow"></i>
             </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'tag-create' %}">
-              <i class="menu-icon mdi mdi-tag-outline"></i>
-              <span class="menu-title">Tags</span>
-            </a>
+            <div class="collapse" id="auth">
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item"> <a class="nav-link" href="pages/samples/login.html"> Login </a></li>
+              </ul>
+            </div>
           </li>
           <li class="nav-item nav-category">help</li>
           <li class="nav-item">
@@ -458,95 +458,23 @@
                           <div class="col-12 col-lg-4 col-lg-12 grid-margin stretch-card">
                             <div class="card card-rounded">
                               <div class="card-body">
-                                <div class="justify-content-between align-items-start">
-                                  <div class="col-8">
-                                   <h4 class="card-title card-title-dash">Tag creation</h4>
-                                   <h5 class="card-subtitle card-subtitle-dash">Lorem Ipsum is simply dummy text of the printing Lorem Ipsum.</h5>
-
-                                   <form method="post" class="forms-sample">
+                                <form method="post">
                                     {% csrf_token %}
-                                    {{ form|crispy }}
-                                    <button class="btn btn-outline-primary" type="submit"><i class="ti-save "></i>Save</button>
-                                  </form>
-                                  </div>                       
-                                </div>
-                                
-                              </div>
+                                    <h5>Are you sure you want to delete the priority " {{ object.name }} "</h5>
+                                    <button type="submit" class="btn btn-outline-danger"><i class="ti-trash btn-icon-prepend"></i>Delete</button>
+                                    <a href="{% url 'priority-create' %}"><button type="button" class="btn btn-outline-primary"><i class="ti-close btn-icon-prepend"></i>Cancel</button></a>
+                                </form> 
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                    
                   </div>
                 </div>
               </div>
             </div>
           </div>
-
-          <div class="row">
-            <div class="col-sm-12">
-              <div class="home-tab">
-                <div class="tab-content tab-content-basic">
-                  <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview"> 
-                    <div class="row">
-                      <div class="col-lg-12 d-flex flex-column">
-                        <div class="row flex-grow">
-                          <div class="col-12 col-lg-4 col-lg-12 grid-margin stretch-card">
-                            <div class="card card-rounded">
-                              <div class="card-body">
-                                <div class="justify-content-between align-items-start">
-                                  <div style="float: right;">
-                                    <a href="{% url 'tag-delete-all' %}"><button type="button" class="btn btn-outline-danger"><i class="ti-trash "></i>Delete all</button></a> 
-                                  </div>
-                                  <div class="col-8">
-                                   <h4 class="card-title card-title-dash">Tags list</h4>
-                                   <h5 class="card-subtitle card-subtitle-dash">{{ tags.count }} tags so far</h5>
-                                   
-                                  </div>
-                                  
-                                  <div class="table-responsive">
-                                    <table class="table table-hover">
-                                      <thead>
-                                        <tr>
-                                          <th>Name</th>
-                                          <th>Action</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                                        {% for t in tags %}
-                                        <tr>
-                                          <td>
-                                            <h6>
-                                              {{ t.name }} 
-                                            </h6>
-                                            <td>
-                                              <a href="{% url 'tag-delete' t.id %}"><button type="button" class="btn btn-outline-danger"><i class="ti-trash "></i></button></a> 
-                                              <a href="{% url 'tag-edit' t.id %}"><button type="button" class="btn btn-outline-success"><i class="ti-pencil "></i></button></a> 
-                                            </td>
-                                          </td>
-                                         
-                                        </tr>
-                                        {% endfor %}
-                                      </tbody>
-                                    </table>
-                                  </div>
-                                  
-                                </div>
-                                
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
+          
         </div>
         <!-- content-wrapper ends -->
         <!-- partial:partials/_footer.html -->

@@ -376,6 +376,8 @@
                     {% if f.project.id == p.id %}
                       <li class="nav-item"> <a class="nav-link" href="#">{{ f.name }}</a></li>
                     {% endif %}
+                  {% empty %}
+                  <li class="nav-item"> <a class="nav-link" href="#">No folder found</a></li>
                   {% endfor %}
                 </ul>
               </div>

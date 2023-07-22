@@ -12,6 +12,8 @@ from django.views.generic import (
     DeleteView
 )
 from django.contrib.auth.mixins import LoginRequiredMixin,UserPassesTestMixin
+from django.shortcuts import redirect
+
 from .forms import TaskForm
 
 # Create your views here.
@@ -110,29 +112,78 @@ class TaskList(LoginRequiredMixin,ListView):
 class PriorityCreate(LoginRequiredMixin,CreateView):
     model = Proritie
     fields = ('__all__')
-    success_url = '/'
+    success_url = '/priority/new/'
 
     def get_context_data(self, **kwargs: Any):
         context = super().get_context_data(**kwargs)
         context['projects'] = self.request.user.owned_projects.all()
         context['folders'] = Folder.objects.all()
+        context['priorities'] = Proritie.objects.all()
         return context
     
     def form_valid(self, form):
         return super().form_valid(form)
     
+class PriorityUpdate(LoginRequiredMixin,UpdateView):
+    model = Proritie
+    fields = ('__all__')
+    success_url = '/priority/new/'
+
+    def get_context_data(self, **kwargs: Any):
+        context = super().get_context_data(**kwargs)
+        context['projects'] = self.request.user.owned_projects.all()
+        context['folders'] = Folder.objects.all()
+        context['priorities'] = Proritie.objects.all()
+        return context
+    
+    def form_valid(self, form):
+        return super().form_valid(form)
+
+class PriorityDelete(LoginRequiredMixin,DeleteView):
+    model = Proritie
+    success_url = '/priority/new/'
+
+def PriorityDeleteAll(request):
+    Proritie.objects.all().delete()
+    return redirect('priority-create')
 
 class TagCreate(LoginRequiredMixin,CreateView):
     model = Tag
     fields = ('__all__')
     success_url = '/tag/new/'
-    extra_context = {'tags':Tag.objects.all()}
+    # extra_context = {'tags':Tag.objects.all()}
 
     def get_context_data(self, **kwargs: Any):
         context = super().get_context_data(**kwargs)
         context['projects'] = self.request.user.owned_projects.all()
         context['folders'] = Folder.objects.all()
+        context['tags']= Tag.objects.all()
         return context
     
     def form_valid(self, form):
         return super().form_valid(form)
+
+class TagDelete(LoginRequiredMixin,DeleteView):
+    model = Tag
+    success_url = '/tag/new/'
+
+class TagUpdate(LoginRequiredMixin,UpdateView):
+    model = Tag
+    fields = ('__all__')
+    success_url = '/tag/new/'
+
+    def get_context_data(self, **kwargs: Any):
+        context = super().get_context_data(**kwargs)
+        context['projects'] = self.request.user.owned_projects.all()
+        context['folders'] = Folder.objects.all()
+        context['tags']= Tag.objects.all()
+        return context
+
+
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
+def TagsDeleteAll(request):
+    Tag.objects.all().delete()
+    return redirect('tag-create')
